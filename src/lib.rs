@@ -56,6 +56,18 @@ impl Universe {
 /// Public methods, exported to JavaScript.
 #[wasm_bindgen]
 impl Universe {
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.cells.as_ptr()
+    }
+
     pub fn tick(&mut self) {
         let mut next = self.cells.clone();
 
@@ -89,8 +101,8 @@ impl Universe {
     }
 
     pub fn new() -> Universe {
-        let width = 32;
-        let height = 32;
+        let width = 64;
+        let height = 64;
 
         let cells = (0..width * height)
             .map(|i| {
