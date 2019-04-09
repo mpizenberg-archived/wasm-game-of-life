@@ -19,8 +19,7 @@ async function run() {
 
   // Definition of the render loop.
   const renderLoop = () => {
-    universe.tick();
-    universe.draw(ctx);
+    universe.tick(ctx);
     requestAnimationFrame(renderLoop);
   };
 

@@ -91,7 +91,7 @@ impl Universe {
         self.height
     }
 
-    pub fn tick(&mut self) {
+    pub fn tick(&mut self, ctx: &CanvasRenderingContext2d) {
         // Update cells.
         for row in 0..self.height {
             for col in 0..self.width {
@@ -102,11 +102,13 @@ impl Universe {
                 let next_cell = match (cell, live_neighbors) {
                     (Cell::Alive, 2) | (Cell::Alive, 3) => Cell::Alive,
                     (Cell::Alive, _) => {
-                        self.make_dead(4 * idx);
+                        ctx.set_fill_style(&JsValue::from_str("#000000"));
+                        ctx.fill_rect(col as f64, row as f64, 1.0, 1.0);
                         Cell::Dead
                     }
                     (Cell::Dead, 3) => {
-                        self.make_alive(4 * idx);
+                        ctx.set_fill_style(&JsValue::from_str("#FFFFFF"));
+                        ctx.fill_rect(col as f64, row as f64, 1.0, 1.0);
                         Cell::Alive
                     }
                     _ => Cell::Dead,
