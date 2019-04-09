@@ -1,35 +1,43 @@
-import { Universe } from "wasm-game-of-life";
-import { memory } from "wasm-game-of-life/wasm_game_of_life_bg";
+import { Universe, default as init } from "./pkg/wasm_game_of_life.js";
 
-// Construct the universe, and get its width and height.
-const universe = Universe.new(512, 512);
-const width = universe.width();
-const height = universe.height();
-
-// Give the canvas room for all of our cells and a 1px border
-// around each of them.
+// Retrieve the canvas in the DOM.
 const canvas = document.getElementById("game-of-life-canvas");
 const ctx = canvas.getContext("2d");
-// ctx.imageSmoothingEnabled = false;
-canvas.height = height;
-canvas.width = width;
 
-const renderLoop = () => {
-  universe.tick();
+async function run() {
+  // Initialize the wasm module.
+  const wasm = await init("pkg/wasm_game_of_life_bg.wasm");
+
+  // Construct the universe, and get its width and height.
+  const universe = Universe.new(512, 512);
+  const width = universe.width();
+  const height = universe.height();
+
+  // Update the canvas size.
+  canvas.height = height;
+  canvas.width = width;
+
+  // Definition of the render loop.
+  const renderLoop = () => {
+    universe.tick();
+    drawCells();
+    requestAnimationFrame(renderLoop);
+  };
+
+  // Function calling the wasm code to draw cells.
+  const drawCells = () => {
+    const canvas_data = new Uint8ClampedArray(
+      wasm.memory.buffer,
+      universe.canvas_data(),
+      4 * width * height
+    );
+    const image_data = new ImageData(canvas_data, width, height);
+    ctx.putImageData(image_data, 0, 0);
+  };
+
+  // Start the drawing loop.
   drawCells();
-
   requestAnimationFrame(renderLoop);
-};
+}
 
-const drawCells = () => {
-  const canvas_data = new Uint8ClampedArray(
-    memory.buffer,
-    universe.canvas_data(),
-    4 * width * height
-  );
-  const image_data = new ImageData(canvas_data, width, height);
-  ctx.putImageData(image_data, 0, 0);
-};
-
-drawCells();
-requestAnimationFrame(renderLoop);
+run();
