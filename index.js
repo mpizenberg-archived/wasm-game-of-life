@@ -20,23 +20,12 @@ async function run() {
   // Definition of the render loop.
   const renderLoop = () => {
     universe.tick();
-    drawCells();
+    universe.draw(ctx);
     requestAnimationFrame(renderLoop);
   };
 
-  // Function calling the wasm code to draw cells.
-  const drawCells = () => {
-    const canvas_data = new Uint8ClampedArray(
-      wasm.memory.buffer,
-      universe.canvas_data(),
-      4 * width * height
-    );
-    const image_data = new ImageData(canvas_data, width, height);
-    ctx.putImageData(image_data, 0, 0);
-  };
-
   // Start the drawing loop.
-  drawCells();
+  universe.draw(ctx);
   requestAnimationFrame(renderLoop);
 }
 
